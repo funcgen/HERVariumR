@@ -1,0 +1,23 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Generated results
+results/
+*.html
+*.Rmd
+*.rds
+
+# Large HERVarium data files
+inst/extdata/fimo_parsed_v4.tsv
+inst/extdata/RBP_fimo.tsv
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+results/
+*.html
+*.rds
+.~lock.*

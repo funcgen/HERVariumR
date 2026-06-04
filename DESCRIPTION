@@ -1,0 +1,32 @@
+Package: HERVariumR
+Title: Fast Functional Annotation and Comparison of Human Endogenous Retrovirus Lists
+Version: 0.0.1
+Authors@R: 
+    person("Tomàs", "Montserrat-Ayuso", 
+           email = "tomas.montserrat@cnag.eu", 
+           role = c("aut", "cre"))
+Description: Tools to annotate and compare lists of human endogenous retrovirus
+    loci using HERVarium annotation layers, including internal retroviral domains,
+    LTR-associated transcription factor binding motifs, RBP motifs, transcript
+    context, IFN-related LTR features, and interactive HTML dashboards.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends:
+    R (>= 4.1.0)
+Imports:
+    data.table,
+    ggplot2,
+    readxl,
+    rmarkdown,
+    DT,
+    plotly,
+    htmltools,
+    utils,
+    stats
+Suggests:
+    testthat (>= 3.0.0),
+    knitr
+Config/testthat/edition: 3
+VignetteBuilder: knitr
