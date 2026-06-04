@@ -85,6 +85,11 @@ annotate_hervs <- function(herv_ids,
   
   herv_ids <- unique(as.character(herv_ids))
   
+  annotation_file <- .get_default_annotation_file(annotation_file)
+  ifn_stat1_file <- .get_default_ifn_stat1_file(ifn_stat1_file)
+  ifn_stat1stat2_irf_file <- .get_default_ifn_stat1stat2_irf_file(ifn_stat1stat2_irf_file)
+  last_exon_file <- .get_default_last_exon_file(last_exon_file)
+  
   annot <- load_transcript_context(annotation_file)
   
   missing_cols <- setdiff(id_columns, colnames(annot))

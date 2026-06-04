@@ -1,0 +1,11 @@
+^results$
+^scripts$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.git$
+^\.gitignore$
+^README\.Rmd$
+^.*\.html$
+^.*\.rds$
+^.*\.Rmd$
+^\.~lock.*^LICENSE\.md$
