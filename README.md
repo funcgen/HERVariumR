@@ -98,30 +98,34 @@ The foreground IDs are removed from the background internally, so the final comp
 HERVariumR includes several annotation files in `inst/extdata`. You can retrieve their installed paths with:
 
 ```r
-hervarium_file("transcript_context.with_herv_id.tsv.gz")
-hervarium_file("LTR_IFN_STAT1_summary.tsv")
-hervarium_file("LTR_IFN_STAT1STAT2_IRF_summary.tsv")
-hervarium_file("HERV_domains_transcript_context_last_exon.xlsx")
+hervarium_file("transcript_context.with_herv_id.tsv.gz", subdir = "extdata")
+hervarium_file("LTR_IFN_STAT1_summary.tsv", subdir = "extdata")
+hervarium_file("LTR_IFN_STAT1STAT2_IRF_summary.tsv", subdir = "extdata")
+hervarium_file("HERV_domains_transcript_context_last_exon.xlsx", subdir = "extdata")
 ```
 
 These bundled resources are used by default by the main functions.
 
-Large motif-level files, such as genome-wide FIMO results for LTR transcription-factor-binding motifs or RBP motifs, are not bundled by default because of their size. They can be supplied manually when running the detailed regulatory layers.
+The package also include the dataset used in the article in `inst/sample_data`:
 
+```r
+hervarium_file("HERV_DESeq2_DEG_all.tsv", subdir = "sample_data")
+```
+
+Large motif-level files, such as genome-wide FIMO results for LTR transcription-factor-binding motifs or RBP motifs, are not bundled by default because of their size. They can be supplied manually when running the detailed regulatory layers. We recommend users to download them from the HERVarium's Zenodo repositories:
+
+- [TFBM FIMO results](https://zenodo.org/records/19593457/files/HERV_LTR_fimo_results_tsv.tar.xz?download=1); please, untar and unzip the file before using it for HERVariumR.  
+- [RBP FIMO results](https://zenodo.org/records/19661036/files/RBP_fimo.tsv?download=1)    
 ---
 
 ## Quick start: profile a list of HERVs
 
-The package includes an example differential-expression table in `sample_data`.
+As mentioned above, the package includes an example differential-expression table in `sample_data`.
 
 ```r
 library(HERVariumR)
 
-deg_file <- system.file(
-  "sample_data",
-  "HERV_DESeq2_DEG_all.tsv",
-  package = "HERVariumR"
-)
+deg_file <- hervarium_file("HERV_DESeq2_DEG_all.tsv", subdir = "sample_data")
 
 deg <- read.delim(deg_file, stringsAsFactors = FALSE)
 
@@ -163,7 +167,7 @@ This produces a `HERVarium_annotation` object containing the matched annotation 
 
 ## Full profiling workflow with detailed TFBM and RBP layers
 
-If detailed motif-level files are available, HERVariumR can add LTR TFBM and RBP motif summaries.
+If detailed motif-level files are available (you can download them following the instructions mentioned above), HERVariumR can add LTR TFBM and RBP motif summaries (recommended).
 
 ```r
 res_cALD_BBB_full <- profile_hervs(
@@ -260,7 +264,7 @@ Returned by:
 
 ```r
 profile_hervs()
-annotate_hervs()
+annotate_hervs() # Used internally also by compare_herv_lists()
 ```
 
 Typical elements include:
