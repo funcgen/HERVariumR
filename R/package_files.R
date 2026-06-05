@@ -1,17 +1,19 @@
-#' Get path to a bundled HERVariumR annotation file
+#' Get path to a bundled HERVariumR file
 #'
-#' Returns the installed path to a file bundled inside `inst/extdata`.
+#' Returns the installed path to a file bundled inside the HERVariumR package.
 #'
-#' @param filename Name of a file inside the package `extdata` directory.
+#' @param filename Name of the bundled file.
+#' @param subdir Subdirectory inside `inst/`. Defaults to `"extdata"`.
 #'
 #' @return Full path to the requested bundled file.
 #' @export
-hervarium_file <- function(filename) {
-  path <- system.file("extdata", filename, package = "HERVariumR")
+hervarium_file <- function(filename, subdir = "extdata") {
+  path <- system.file(subdir, filename, package = "HERVariumR")
   
   if (path == "") {
     stop(
       "Could not find bundled HERVariumR file: ", filename,
+      " in inst/", subdir, "/",
       call. = FALSE
     )
   }

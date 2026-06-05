@@ -2,16 +2,18 @@
 % Please edit documentation in R/package_files.R
 \name{hervarium_file}
 \alias{hervarium_file}
-\title{Get path to a bundled HERVariumR annotation file}
+\title{Get path to a bundled HERVariumR file}
 \usage{
-hervarium_file(filename)
+hervarium_file(filename, subdir = "extdata")
 }
 \arguments{
-\item{filename}{Name of a file inside the package \code{extdata} directory.}
+\item{filename}{Name of the bundled file.}
+
+\item{subdir}{Subdirectory inside \verb{inst/}. Defaults to \code{"extdata"}.}
 }
 \value{
 Full path to the requested bundled file.
 }
 \description{
-Returns the installed path to a file bundled inside \code{inst/extdata}.
+Returns the installed path to a file bundled inside the HERVariumR package.
 }
