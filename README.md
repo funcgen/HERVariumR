@@ -22,7 +22,7 @@ HERVariumR converts those lists into interpretable biological summaries by integ
 * terminal-exon domain annotations;
 * static plots and interactive HTML dashboards.
 
-The main philosophy of HERVariumR is simple: **start from a list of HERV IDs and obtain a compact, publication-ready biological interpretation**.
+The main philosophy of HERVariumR is simple: **start from a list of HERV IDs and obtain a compact, biological interpretation**.
 
 ---
 
