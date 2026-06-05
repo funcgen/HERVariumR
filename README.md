@@ -1,5 +1,9 @@
 # HERVariumR
 
+<p align="center">
+  <img src="man/figures/HERVariumR_logo.png" width="350">
+</p>
+
 **HERVariumR** is an R package for fast functional annotation, profiling, and comparison of human endogenous retrovirus (HERV) locus lists.
 
 The package is designed for researchers who quantify HERV expression at the locus level and obtain lists of HERVs of interest, such as differentially expressed HERVs, condition-specific HERVs, interferon-responsive HERVs, or HERVs associated with a given cell type or disease state.
