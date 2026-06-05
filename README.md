@@ -519,46 +519,6 @@ A stricter cutoff is useful when the goal is to focus on more conserved domain a
 
 ---
 
-## Large external files
-
-Some optional layers require large external files.
-
-### LTR TFBM file
-
-Used when:
-
-```r
-add_tfbm_details = TRUE
-```
-
-Required argument:
-
-```r
-fimo_file = "path/to/fimo_parsed_v4.tsv"
-```
-
-Expected content: FIMO-like transcription-factor-binding motif results mapped to LTR sequence names.
-
----
-
-### RBP motif file
-
-Used when:
-
-```r
-add_rbp_details = TRUE
-```
-
-Required argument:
-
-```r
-rbp_file = "path/to/RBP_fimo.tsv"
-```
-
-Expected content: FIMO-like RBP motif results mapped to HERV internal-region sequence names.
-
----
-
 ## Generated files
 
 Depending on the selected options, HERVariumR writes output files to `output_dir`.
