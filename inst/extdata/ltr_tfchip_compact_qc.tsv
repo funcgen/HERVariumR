@@ -1,0 +1,12 @@
+metric	value
+annotation_ltr_names	22683
+tfchip_source_rows	560594
+tfchip_source_unique_sequence_name	560594
+bridge_rows	560594
+bridge_missing_hervariumr_sequence_name	0
+tfchip_compact_rows	560594
+tfchip_compact_unique_sequence_name	560594
+annotation_ltr_names_found_in_tfchip_compact	22683
+annotation_ltr_names_missing_from_tfchip_compact	0
+tfchip_overlap_true_rows	194122
+tfchip_compact_n_columns	21

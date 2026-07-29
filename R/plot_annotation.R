@@ -183,6 +183,30 @@ plot_herv_annotation <- function(x, output_dir = NULL, top_n = 25) {
   ggplot2::ggsave(file.path(output_dir, "max_domain_coverage_distribution.png"), p, width = 7, height = 4, dpi = 300)
   
   # 4. LTR TFBM burden distribution
+  # The compact feature contract retains the separate 5′ and 3′ LTR burdens.
+  # Reconstruct the historical combined value locally for this plot only.
+  if (!"total_ltr_tfbm_burden" %in% colnames(features)) {
+    required_ltr_burden_cols <- c(
+      "ltr5_tfbm_burden",
+      "ltr3_tfbm_burden"
+    )
+    missing_ltr_burden_cols <- setdiff(
+      required_ltr_burden_cols,
+      colnames(features)
+    )
+
+    if (length(missing_ltr_burden_cols) > 0) {
+      stop(
+        "plot_herv_annotation() requires: ",
+        paste(required_ltr_burden_cols, collapse = ", ")
+      )
+    }
+
+    features$total_ltr_tfbm_burden <-
+      suppressWarnings(as.numeric(features$ltr5_tfbm_burden)) +
+      suppressWarnings(as.numeric(features$ltr3_tfbm_burden))
+  }
+
   p <- ggplot2::ggplot(features, ggplot2::aes(x = total_ltr_tfbm_burden)) +
     ggplot2::geom_histogram(bins = 30) +
     ggplot2::labs(

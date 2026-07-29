@@ -14,7 +14,8 @@ annotate_hervs(
   domain_coverage_cutoff = 0.4,
   keep_raw_domain_columns = TRUE,
   output_dir = NULL,
-  verbose = TRUE
+  verbose = TRUE,
+  .return_full_features = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ annotate_hervs(
 \item{output_dir}{Optional output directory where annotation tables will be written.}
 
 \item{verbose}{Logical. Whether to print progress messages.}
+
+\item{.return_full_features}{Internal use only. Whether to return the full feature matrix before compact user-facing pruning.}
 }
 \value{
 A \code{HERVarium_annotation} object containing matched annotation rows, compact feature summaries, missing IDs, summary statistics, and output metadata.

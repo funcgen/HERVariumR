@@ -4,7 +4,8 @@ add_ltr_tfbm_details <- function(x,
                                  qvalue_cutoff = 1,
                                  top_n_motifs = 25,
                                  use_awk = TRUE,
-                                 show_progress = TRUE) {
+                                 show_progress = TRUE,
+                                 .return_full_features = FALSE) {
   
   if (!file.exists(fimo_file)) {
     stop("FIMO file not found: ", fimo_file)
@@ -446,15 +447,21 @@ add_ltr_tfbm_details <- function(x,
   
   update_progress("Writing final outputs")
   
+  out_features <- if (.return_full_features) {
+    features
+  } else {
+    select_compact_herv_features(features)
+  }
+
   if (inherits(x, "HERVarium_annotation")) {
-    x$features <- features
+    x$features <- out_features
     x$ltr_tfbm_hits <- tfbm_hits
     x$ltr_tfbm_summary <- ltr_tfbm_summary
     x$herv_tfbm_summary <- herv_tfbm_summary
     x$top_tfbm_motifs <- top_tfbm_motifs
     
     write.table(
-      features,
+      select_compact_herv_features(features),
       file = file.path(output_dir, "herv_features_compact.tsv"),
       sep = "\t",
       quote = FALSE,
@@ -466,5 +473,5 @@ add_ltr_tfbm_details <- function(x,
     return(x)
   }
   
-  features
+  out_features
 }

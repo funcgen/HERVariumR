@@ -8,4 +8,15 @@
 ^.*\.html$
 ^.*\.rds$
 ^.*\.Rmd$
-^\.~lock.*^LICENSE\.md$
+^\.~lock.*$
+^LICENSE\.md$
+^CURRENT_STATUS\.md$
+^HERVariumR_OUTPUT_SIMPLIFICATION_PLAN\.md$
+^diff_check\.txt$
+^directory\.txt$
+^documentation_diff_after_patch\.txt$
+^documentation_source_blocks\.txt$
+^manual_results$
+^test_output_simplification$
+^test_profile_tfchip_refinement$
+^test_tfchip_full_list_v2$

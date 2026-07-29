@@ -16,6 +16,7 @@
 #' @param keep_raw_domain_columns Logical. Whether to keep unfiltered domain annotation columns with `_raw` suffixes.
 #' @param output_dir Optional output directory where annotation tables will be written.
 #' @param verbose Logical. Whether to print progress messages.
+#' @param .return_full_features Internal use only. Whether to return the full feature matrix before compact user-facing pruning.
 #'
 #' @return A `HERVarium_annotation` object containing matched annotation rows, compact feature summaries, missing IDs, summary statistics, and output metadata.
 #' @export
@@ -28,70 +29,85 @@ annotate_hervs <- function(herv_ids,
                            domain_coverage_cutoff = 0.40,
                            keep_raw_domain_columns = TRUE,
                            output_dir = NULL,
-                           verbose = TRUE) {
-  
+                           verbose = TRUE,
+                           .return_full_features = FALSE) {
+
   hervarium_file <- function(filename) {
     path <- system.file("extdata", filename, package = "HERVariumR")
-    
+
     if (path == "") {
       stop(
         "Could not find bundled HERVariumR file: ", filename,
         call. = FALSE
       )
     }
-    
+
     path
   }
-  
-  
+
+
   .get_default_annotation_file <- function(annotation_file = NULL) {
     if (!is.null(annotation_file)) {
       return(annotation_file)
     }
-    
+
     hervarium_file("transcript_context.with_herv_id.tsv.gz")
   }
-  
-  
+
+
   .get_default_ifn_stat1_file <- function(ifn_stat1_file = NULL) {
     if (!is.null(ifn_stat1_file)) {
       return(ifn_stat1_file)
     }
-    
+
     hervarium_file("LTR_IFN_STAT1_summary.tsv")
   }
-  
-  
+
+
   .get_default_ifn_stat1stat2_irf_file <- function(ifn_stat1stat2_irf_file = NULL) {
     if (!is.null(ifn_stat1stat2_irf_file)) {
       return(ifn_stat1stat2_irf_file)
     }
-    
+
     hervarium_file("LTR_IFN_STAT1STAT2_IRF_summary.tsv")
   }
-  
-  
+
+
   .get_default_last_exon_file <- function(last_exon_file = NULL) {
     if (!is.null(last_exon_file)) {
       return(last_exon_file)
     }
-    
+
     hervarium_file("HERV_domains_transcript_context_last_exon.xlsx")
   }
-  
+
   if (missing(herv_ids) || length(herv_ids) == 0) {
     stop("Please provide a vector of HERV IDs.")
   }
-  
-  herv_ids <- unique(as.character(herv_ids))
-  
+
+  herv_ids <- .clean_herv_id_vector(herv_ids)
+  n_invalid_herv_ids <- attr(herv_ids, "n_invalid_removed")
+  n_duplicate_herv_ids <- attr(herv_ids, "n_duplicates_removed")
+
+  if (length(herv_ids) == 0) {
+    stop("No valid HERV IDs remain after removing NA, empty, '.', and 'NA' values.")
+  }
+
+  if (verbose && n_invalid_herv_ids > 0) {
+    message("Dropped invalid HERV IDs: ", n_invalid_herv_ids, " (NA, empty, '.', or 'NA').")
+  }
+
+  if (verbose && n_duplicate_herv_ids > 0) {
+    message("Dropped duplicated HERV IDs: ", n_duplicate_herv_ids)
+  }
+
   annotation_file <- .get_default_annotation_file(annotation_file)
   ifn_stat1_file <- .get_default_ifn_stat1_file(ifn_stat1_file)
   ifn_stat1stat2_irf_file <- .get_default_ifn_stat1stat2_irf_file(ifn_stat1stat2_irf_file)
   last_exon_file <- .get_default_last_exon_file(last_exon_file)
-  
+
   annot <- load_transcript_context(annotation_file)
-  
+
   missing_cols <- setdiff(id_columns, colnames(annot))
   if (length(missing_cols) > 0) {
     stop(
@@ -99,43 +115,43 @@ annotate_hervs <- function(herv_ids,
       paste(missing_cols, collapse = ", ")
     )
   }
-  
+
   matched <- annot[
     annot[[id_columns[1]]] %in% herv_ids |
       annot[[id_columns[2]]] %in% herv_ids,
   ]
-  
+
   matched <- filter_herv_domains_by_coverage(
     matched,
     coverage_cutoff = domain_coverage_cutoff,
     keep_raw_domain_columns = keep_raw_domain_columns
   )
-  
+
   features <- summarize_herv_features(matched)
-  
+
   features <- add_ltr_ifn_annotations(
     features = features,
     stat1_file = ifn_stat1_file,
     stat1stat2_irf_file = ifn_stat1stat2_irf_file
   )
-  
+
   features <- add_terminal_exon_domain_annotations(
     features = features,
     last_exon_file = last_exon_file
   )
-  
+
   features <- apply_terminal_domain_coverage_cutoff(
     features,
     coverage_cutoff = domain_coverage_cutoff
   )
-  
+
   matched_ids <- unique(c(
     matched[[id_columns[1]]],
     matched[[id_columns[2]]]
   ))
-  
+
   missing_ids <- setdiff(herv_ids, matched_ids)
-  
+
   stats <- data.frame(
     n_input = length(herv_ids),
     n_matched_rows = nrow(matched),
@@ -150,25 +166,25 @@ annotate_hervs <- function(herv_ids,
     mean_ltr5_tfbm_burden = mean(matched$ltr5_tfbm_burden, na.rm = TRUE),
     mean_ltr3_tfbm_burden = mean(matched$ltr3_tfbm_burden, na.rm = TRUE)
   )
-  
+
   if (verbose) {
     message("Input HERV IDs: ", length(herv_ids))
     message("Matched rows: ", nrow(matched))
     message("Unique matched HERVs: ", length(unique(matched$HERV_id)))
     message("Missing IDs: ", length(missing_ids))
   }
-  
+
   if (!is.null(output_dir)) {
     if (!dir.exists(output_dir)) {
       dir.create(output_dir, recursive = TRUE)
     }
-    
+
     matched_report <- matched
-    
+
     if ("domains_gene" %in% colnames(matched_report)) {
       matched_report$domains_gene <- NULL
     }
-    
+
     write.table(
       matched_report,
       file = file.path(output_dir, "herv_annotation_summary.tsv"),
@@ -176,15 +192,15 @@ annotate_hervs <- function(herv_ids,
       quote = FALSE,
       row.names = FALSE
     )
-    
+
     write.table(
-      features,
+      select_compact_herv_features(features),
       file = file.path(output_dir, "herv_features_compact.tsv"),
       sep = "\t",
       quote = FALSE,
       row.names = FALSE
     )
-    
+
     write.table(
       stats,
       file = file.path(output_dir, "annotation_stats.tsv"),
@@ -192,28 +208,34 @@ annotate_hervs <- function(herv_ids,
       quote = FALSE,
       row.names = FALSE
     )
-    
+
     writeLines(
       missing_ids,
       con = file.path(output_dir, "missing_herv_ids.txt")
     )
-    
+
     if (verbose) {
       message("Results written to: ", output_dir)
     }
   }
-  
+
+  out_features <- if (.return_full_features) {
+    features
+  } else {
+    select_compact_herv_features(features)
+  }
+
   out <- list(
     summary = matched,
-    features = features,
+    features = out_features,
     missing_ids = missing_ids,
     stats = stats,
     output_dir = output_dir
   )
   out$domain_coverage_cutoff <- domain_coverage_cutoff
-  
+
   class(out) <- "HERVarium_annotation"
-  
+
   return(out)
 }
 
@@ -222,16 +244,16 @@ print.HERVarium_annotation <- function(x, ...) {
   cat("HERVarium annotation result\n")
   cat("---------------------------\n")
   print(x$stats)
-  
+
   if (!is.null(x$output_dir)) {
     cat("\nOutput directory:\n")
     cat(x$output_dir, "\n")
   }
-  
+
   if (length(x$missing_ids) > 0) {
     cat("\nMissing IDs:\n")
     print(x$missing_ids)
   }
-  
+
   invisible(x)
 }

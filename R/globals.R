@@ -1,0 +1,31 @@
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c(
+    "context",
+    "coverage",
+    "delta_median",
+    "domain",
+    "domain_count",
+    "domain_type",
+    "feature",
+    "has_any_ifn_related_ltr_motif",
+    "has_any_terminal_exon_domain",
+    "label",
+    "log2_or_plot",
+    "ltr3_n_tfbm_hits",
+    "ltr5_n_tfbm_hits",
+    "ltr_position",
+    "ltr_tfbm_asymmetry",
+    "max_domain_cov",
+    "mean_hits",
+    "motif_alt_id",
+    "n",
+    "n_hervs",
+    "percent_hervs",
+    "present",
+    "rbp_burden",
+    "significance_label",
+    "subfamily",
+    "subfamily_group",
+    "total_ltr_tfbm_burden"
+  ))
+}

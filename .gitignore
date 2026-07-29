@@ -21,3 +21,32 @@ results/
 *.html
 *.rds
 .~lock.*
+
+# HERVariumR private project governance
+CURRENT_STATUS*.md
+DECISIONS.md
+TODO.md
+SOURCE_INDEX.md
+MANIFEST.md
+HERVariumR_*SNAPSHOT*.md
+HERVariumR_OUTPUT_SIMPLIFICATION_PLAN.md
+
+# Development and validation scripts
+scripts/
+
+# Generated validation outputs
+manual_results/
+test_output_simplification/
+test_profile_tfchip_refinement/
+test_tfchip_full_list_v2/
+test_dashboard_workflow_after_patch/
+test_interactive_outputs/
+test_tfchip_profile/
+test_tfchip_compare/
+
+# Development scratch files
+diff_check.txt
+directory.txt
+documentation_diff_after_patch.txt
+documentation_source_blocks.txt
+diff.txt

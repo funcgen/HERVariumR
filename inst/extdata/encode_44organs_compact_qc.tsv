@@ -1,0 +1,13 @@
+metric	value
+annotation_rows	53176
+internal_compact_rows	53176
+internal_compact_unique_HERV_id	53176
+internal_compact_unique_internal_region_id	53176
+internal_compact_missing_internal_region_id	0
+ltr_compact_rows	560594
+ltr_compact_unique_sequence_name	560594
+annotation_ltr_names	22683
+annotation_ltr_names_found_in_ltr_compact	22683
+annotation_ltr_names_missing_from_ltr_compact	0
+internal_compact_n_columns	92
+ltr_compact_n_columns	69

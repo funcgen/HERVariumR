@@ -3,7 +3,8 @@ add_rbp_details <- function(x,
                             output_dir = NULL,
                             qvalue_cutoff = 1,
                             use_awk = TRUE,
-                            show_progress = TRUE) {
+                            show_progress = TRUE,
+                            .return_full_features = FALSE) {
   
   if (!file.exists(rbp_file)) {
     stop("RBP FIMO file not found: ", rbp_file)
@@ -269,15 +270,21 @@ add_rbp_details <- function(x,
   update_progress("Writing final RBP outputs")
   
   write.table(
-    features,
+    select_compact_herv_features(features),
     file = file.path(output_dir, "herv_features_compact.tsv"),
     sep = "\t",
     quote = FALSE,
     row.names = FALSE
   )
   
+  out_features <- if (.return_full_features) {
+    features
+  } else {
+    select_compact_herv_features(features)
+  }
+
   if (inherits(x, "HERVarium_annotation")) {
-    x$features <- features
+    x$features <- out_features
     x$rbp_hits <- rbp_hits
     x$herv_rbp_summary <- herv_rbp_summary
     
@@ -285,5 +292,5 @@ add_rbp_details <- function(x,
     return(x)
   }
   
-  features
+  out_features
 }

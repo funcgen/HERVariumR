@@ -13,6 +13,11 @@ compare_herv_lists(
   ifn_stat1_file = NULL,
   ifn_stat1stat2_irf_file = NULL,
   last_exon_file = NULL,
+  add_external_evidence = TRUE,
+  internal_encode_file = NULL,
+  ltr_encode_file = NULL,
+  add_tfchip = TRUE,
+  tfchip_file = NULL,
   domain_coverage_cutoff = 0.4,
   keep_raw_domain_columns = TRUE,
   output_dir = "HERVariumR_comparison",
@@ -24,7 +29,9 @@ compare_herv_lists(
   rbp_qvalue_cutoff = 1,
   use_awk = TRUE,
   min_feature_count = 1,
-  make_plots = TRUE,
+  output_level = c("standard", "extended"),
+  make_dashboard = TRUE,
+  make_plots = NULL,
   plot_top_n = 25,
   plot_all_binary_features = TRUE,
   plot_padj_cutoff = 0.05,
@@ -37,67 +44,119 @@ compare_herv_lists(
 \arguments{
 \item{foreground_ids}{Character vector of foreground HERV IDs.}
 
-\item{background_ids}{Character vector of background HERV IDs. Foreground IDs are removed internally.}
+\item{background_ids}{Character vector defining the background universe.
+Foreground IDs are removed internally.}
 
 \item{foreground_name}{Character label for the foreground group.}
 
-\item{background_name}{Character label for the background group.}
+\item{background_name}{Character label for the effective non-foreground
+background group.}
 
-\item{annotation_file}{Path to the main transcript-context annotation file.}
+\item{annotation_file}{Optional path to the main transcript-context
+annotation file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{ifn_stat1_file}{Path to the STAT1 LTR summary file.}
+\item{ifn_stat1_file}{Optional path to the STAT1 LTR summary file. If \code{NULL},
+the bundled HERVariumR resource is used.}
 
-\item{ifn_stat1stat2_irf_file}{Path to the STAT1/STAT2/IRF LTR summary file.}
+\item{ifn_stat1stat2_irf_file}{Optional path to the STAT1/STAT2/IRF LTR
+summary file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{last_exon_file}{Path to the terminal-exon domain annotation file.}
+\item{last_exon_file}{Optional path to the terminal-exon domain annotation
+file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{domain_coverage_cutoff}{Numeric. Minimum HMM profile coverage required for an internal retroviral domain to be considered valid.}
+\item{add_external_evidence}{Logical. Whether to add compact ENCODE/UCSC
+44-organ evidence and LTR-specific cCRE context.}
 
-\item{keep_raw_domain_columns}{Logical. Whether to keep unfiltered domain annotation columns with \verb{_raw} suffixes.}
+\item{internal_encode_file}{Optional path to
+\code{internal_encode_44organs_compact.tsv.gz}. If \code{NULL}, the bundled resource
+is used.}
 
-\item{output_dir}{Directory where output tables, plots, and reports will be written.}
+\item{ltr_encode_file}{Optional path to
+\code{ltr_encode_44organs_compact.tsv.gz}. If \code{NULL}, the bundled resource is
+used.}
 
-\item{add_tfbm_details}{Logical. Whether to add detailed LTR TFBM motif enrichment.}
+\item{add_tfchip}{Logical. Whether to add compact LTR TF ChIP-seq
+peak-cluster overlap evidence.}
 
-\item{fimo_file}{Path to the detailed LTR TFBM FIMO file.}
+\item{tfchip_file}{Optional path to \code{ltr_tfchip_compact.tsv.gz}. If \code{NULL},
+the bundled resource is used.}
 
-\item{qvalue_cutoff}{Numeric. Maximum q-value allowed for detailed LTR TFBM hits.}
+\item{domain_coverage_cutoff}{Numeric. Minimum HMM profile coverage required
+for an internal retroviral domain to be retained.}
 
-\item{add_rbp_details}{Logical. Whether to add detailed RBP motif enrichment.}
+\item{keep_raw_domain_columns}{Logical. Whether raw, unfiltered domain
+columns are retained internally during annotation and comparison.}
 
-\item{rbp_file}{Path to the detailed RBP FIMO file.}
+\item{output_dir}{Directory where compact outputs, objects, dashboards, and
+optional detailed results are written.}
 
-\item{rbp_qvalue_cutoff}{Numeric. Maximum q-value allowed for detailed RBP motif hits.}
+\item{add_tfbm_details}{Logical. Whether to add detailed LTR TFBM motif
+enrichment from a user-supplied FIMO file.}
 
-\item{use_awk}{Logical. Whether to use awk for fast filtering of large FIMO files.}
+\item{fimo_file}{Path to the detailed LTR TFBM FIMO file. Required when
+\code{add_tfbm_details = TRUE}; this large file is not bundled.}
 
-\item{min_feature_count}{Integer. Minimum total count required to keep an enrichment feature.}
+\item{qvalue_cutoff}{Numeric. Maximum q-value retained for detailed TFBM hits.}
 
-\item{make_plots}{Logical. Whether to generate comparison plots automatically.}
+\item{add_rbp_details}{Logical. Whether to add detailed RBP motif enrichment
+from a user-supplied motif file.}
 
-\item{plot_top_n}{Integer. Number of top features to show in comparison plots.}
+\item{rbp_file}{Path to the detailed RBP motif file. Required when
+\code{add_rbp_details = TRUE}; this large file is not bundled.}
 
-\item{plot_all_binary_features}{Logical. Whether to show all binary features in the binary-feature plot.}
+\item{rbp_qvalue_cutoff}{Numeric. Maximum q-value retained for detailed RBP
+hits.}
 
-\item{plot_padj_cutoff}{Numeric. FDR cutoff used to label significant features in plots.}
+\item{use_awk}{Logical. Whether to use \code{awk} for memory-efficient filtering
+of large motif files.}
 
-\item{plot_show_only_significant}{Logical. Whether plots should show only FDR-significant features.}
+\item{min_feature_count}{Integer. Minimum total foreground-plus-background
+count required to retain a categorical enrichment feature.}
 
-\item{plot_pseudocount}{Numeric. Pseudocount used only for plotting log2 odds ratios when contingency-table cells are zero.}
+\item{output_level}{Output verbosity: \code{"standard"} or \code{"extended"}.
+Standard mode writes compact primary outputs and the unified key-results
+table. Extended mode additionally writes detailed tables and supports
+static plots.}
+
+\item{make_dashboard}{Logical. Whether to generate the concise interactive
+HTML dashboard.}
+
+\item{make_plots}{Logical or \code{NULL}. Whether to generate static comparison
+plots. \code{NULL} defaults to \code{FALSE} in standard mode and \code{TRUE} in extended
+mode.}
+
+\item{plot_top_n}{Integer. Number of top features displayed in plots and
+dashboard sections.}
+
+\item{plot_all_binary_features}{Logical. Whether the static binary-feature
+plot may include all tested binary features.}
+
+\item{plot_padj_cutoff}{Numeric. FDR cutoff used to classify plotted results
+as significant.}
+
+\item{plot_show_only_significant}{Logical. Whether static plots show only
+FDR-significant results.}
+
+\item{plot_pseudocount}{Numeric. Pseudocount used only when plotting log2
+odds ratios with zero contingency-table cells.}
 
 \item{verbose}{Logical. Whether to print progress messages.}
 
-\item{show_progress}{Logical. Whether to show progress bars for long-running steps.}
+\item{show_progress}{Logical. Whether to display progress bars for
+long-running motif-file operations.}
 }
 \value{
-A \code{HERVarium_comparison} object containing comparison tables, optional regulatory enrichment layers, plots, and output metadata.
+A \code{HERVarium_comparison} object containing mutually exclusive input
+groups, compact HERV-level features, the unified key-results table,
+underlying comparison tables, optional detailed regulatory enrichments,
+annotation metadata, and generated-file paths.
 }
 \description{
 Compares a foreground HERV list against a background HERV universe using
-HERVariumR annotation layers. Foreground IDs are removed from the background
-internally, so the comparison is performed between mutually exclusive groups.
-The function performs binary feature enrichment, numeric feature comparison,
-subfamily enrichment, domain-type enrichment, IFN/LTR feature enrichment,
-LTR TFBM burden comparison, optional detailed 5' LTR, 3' LTR and combined
-LTR TFBM motif enrichment, and optional RBP motif enrichment.
+HERVariumR annotation layers. Foreground IDs are removed from the supplied
+background internally, so the statistical comparison uses mutually exclusive
+groups. The workflow includes core HERV, transcript-context, internal-domain,
+5′ and 3′ LTR, motif-burden, and bundled external-regulatory evidence.
+Detailed TFBM and RBP motif enrichment can optionally be added from
+user-supplied files.
 }

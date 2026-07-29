@@ -22,14 +22,15 @@ generate_hervarium_dashboard(
 
 \item{title}{Report title.}
 
-\item{top_n}{Number of top features to show in dashboard plots.}
+\item{top_n}{Number of top features shown in dashboard plots.}
 
 \item{self_contained}{Whether to produce a self-contained HTML file.}
 }
 \value{
-Invisibly returns the path to the generated HTML dashboard.
+Invisibly returns the generated HTML path.
 }
 \description{
-Generates an HTML dashboard from either a HERVarium_annotation or
-HERVarium_comparison object.
+Generates a concise HTML dashboard from a \code{HERVarium_annotation} or
+\code{HERVarium_comparison} object. Temporary R Markdown source files are rendered
+outside the user output directory and removed automatically.
 }

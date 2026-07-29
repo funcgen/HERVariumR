@@ -11,6 +11,11 @@ profile_hervs(
   ifn_stat1_file = NULL,
   ifn_stat1stat2_irf_file = NULL,
   last_exon_file = NULL,
+  add_external_evidence = TRUE,
+  internal_encode_file = NULL,
+  ltr_encode_file = NULL,
+  add_tfchip = TRUE,
+  tfchip_file = NULL,
   domain_coverage_cutoff = 0.4,
   keep_raw_domain_columns = TRUE,
   add_tfbm_details = FALSE,
@@ -20,9 +25,11 @@ profile_hervs(
   rbp_file = NULL,
   rbp_qvalue_cutoff = 1,
   use_awk = TRUE,
-  make_plots = TRUE,
-  make_ltr_tfbm_plots = TRUE,
-  make_internal_domain_plot = TRUE,
+  output_level = c("standard", "extended"),
+  make_dashboard = TRUE,
+  make_plots = NULL,
+  make_ltr_tfbm_plots = NULL,
+  make_internal_domain_plot = NULL,
   top_n = 25,
   top_n_motifs = 25,
   top_n_subfamilies = 20,
@@ -34,59 +41,109 @@ profile_hervs(
 \arguments{
 \item{herv_ids}{Character vector of HERV IDs to annotate.}
 
-\item{annotation_file}{Optional path to the main transcript-context annotation file. If \code{NULL}, the bundled HERVariumR annotation file is used.}
+\item{annotation_file}{Optional path to the main transcript-context annotation
+file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{output_dir}{Directory where output tables, plots, and reports will be written.}
+\item{output_dir}{Directory where output tables, objects, plots, and reports
+are written.}
 
-\item{ifn_stat1_file}{Optional path to the STAT1 LTR summary file. If \code{NULL}, the bundled HERVariumR file is used.}
+\item{ifn_stat1_file}{Optional path to the STAT1 LTR summary file. If \code{NULL},
+the bundled HERVariumR resource is used.}
 
-\item{ifn_stat1stat2_irf_file}{Optional path to the STAT1/STAT2/IRF LTR summary file. If \code{NULL}, the bundled HERVariumR file is used.}
+\item{ifn_stat1stat2_irf_file}{Optional path to the STAT1/STAT2/IRF LTR
+summary file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{last_exon_file}{Optional path to the terminal-exon domain annotation file. If \code{NULL}, the bundled HERVariumR file is used.}
+\item{last_exon_file}{Optional path to the terminal-exon domain annotation
+file. If \code{NULL}, the bundled HERVariumR resource is used.}
 
-\item{domain_coverage_cutoff}{Numeric. Minimum HMM profile coverage required for an internal retroviral domain to be considered valid.}
+\item{add_external_evidence}{Logical. Whether to add compact ENCODE/UCSC
+44-organ evidence and LTR-specific cCRE context.}
 
-\item{keep_raw_domain_columns}{Logical. Whether to keep unfiltered domain annotation columns with \verb{_raw} suffixes.}
+\item{internal_encode_file}{Optional path to
+\code{internal_encode_44organs_compact.tsv.gz}. If \code{NULL}, the bundled resource
+is used.}
 
-\item{add_tfbm_details}{Logical. Whether to add detailed LTR TFBM annotations from a FIMO file.}
+\item{ltr_encode_file}{Optional path to
+\code{ltr_encode_44organs_compact.tsv.gz}. If \code{NULL}, the bundled resource is
+used.}
 
-\item{fimo_file}{Path to the detailed LTR TFBM FIMO file. This large file is not bundled with the package and must be provided by the user when \code{add_tfbm_details = TRUE}.}
+\item{add_tfchip}{Logical. Whether to add compact LTR TF ChIP-seq
+peak-cluster overlap evidence.}
 
-\item{qvalue_cutoff}{Numeric. Maximum q-value allowed for detailed LTR TFBM hits.}
+\item{tfchip_file}{Optional path to \code{ltr_tfchip_compact.tsv.gz}. If \code{NULL},
+the bundled resource is used.}
 
-\item{add_rbp_details}{Logical. Whether to add detailed RBP motif annotations from a FIMO-like file.}
+\item{domain_coverage_cutoff}{Numeric. Minimum HMM profile coverage required
+for an internal retroviral domain to be retained.}
 
-\item{rbp_file}{Path to the detailed RBP FIMO file. This large file is not bundled with the package and must be provided by the user when \code{add_rbp_details = TRUE}.}
+\item{keep_raw_domain_columns}{Logical. Whether raw, unfiltered domain
+columns are retained internally during annotation.}
 
-\item{rbp_qvalue_cutoff}{Numeric. Maximum q-value allowed for detailed RBP motif hits.}
+\item{add_tfbm_details}{Logical. Whether to add detailed LTR TFBM annotations
+from a user-supplied FIMO file.}
 
-\item{use_awk}{Logical. Whether to use awk for fast filtering of large FIMO files.}
+\item{fimo_file}{Path to the detailed LTR TFBM FIMO file. Required when
+\code{add_tfbm_details = TRUE}; this large file is not bundled.}
 
-\item{make_plots}{Logical. Whether to generate summary plots.}
+\item{qvalue_cutoff}{Numeric. Maximum q-value retained for detailed TFBM hits.}
 
-\item{make_ltr_tfbm_plots}{Logical. Whether to generate detailed LTR TFBM plots when \code{add_tfbm_details = TRUE}.}
+\item{add_rbp_details}{Logical. Whether to add detailed RBP motif annotations
+from a user-supplied FIMO-like file.}
 
-\item{make_internal_domain_plot}{Logical. Whether to generate the internal-domain conservation bubble plot.}
+\item{rbp_file}{Path to the detailed RBP motif file. Required when
+\code{add_rbp_details = TRUE}; this large file is not bundled.}
 
-\item{top_n}{Integer. Number of top categories to show in general plots.}
+\item{rbp_qvalue_cutoff}{Numeric. Maximum q-value retained for detailed RBP
+hits.}
 
-\item{top_n_motifs}{Integer. Number of top TF/RBP motifs to show in motif plots.}
+\item{use_awk}{Logical. Whether to use \code{awk} for memory-efficient filtering
+of large motif files.}
 
-\item{top_n_subfamilies}{Integer. Number of top HERV subfamilies to show in subfamily-level plots.}
+\item{output_level}{Output verbosity: \code{"standard"} or \code{"extended"}.
+Standard mode writes the compact primary outputs. Extended mode also writes
+detailed tables and supports static plots.}
 
-\item{internal_domain_size_by}{Character. Bubble-size mode for the internal domain plot. One of \code{"fixed"} or \code{"domain_count"}.}
+\item{make_dashboard}{Logical. Whether to generate the concise interactive
+HTML dashboard.}
+
+\item{make_plots}{Logical or \code{NULL}. Whether to generate static summary
+plots. \code{NULL} defaults to \code{FALSE} in standard mode and \code{TRUE} in extended
+mode.}
+
+\item{make_ltr_tfbm_plots}{Logical or \code{NULL}. Whether to generate detailed
+LTR TFBM static plots when detailed TFBM results are available. \code{NULL}
+follows the selected output level.}
+
+\item{make_internal_domain_plot}{Logical or \code{NULL}. Whether to generate the
+internal-domain conservation plot. \code{NULL} follows the selected output level.}
+
+\item{top_n}{Integer. Number of top categories displayed in general plots
+and the dashboard.}
+
+\item{top_n_motifs}{Integer. Number of top motifs displayed in detailed
+motif outputs.}
+
+\item{top_n_subfamilies}{Integer. Number of top HERV subfamilies displayed
+in subfamily-level plots.}
+
+\item{internal_domain_size_by}{Character. Bubble-size mode for the internal
+domain plot: \code{"fixed"} or \code{"domain_count"}.}
 
 \item{verbose}{Logical. Whether to print progress messages.}
 
-\item{show_progress}{Logical. Whether to show progress bars for long-running steps.}
+\item{show_progress}{Logical. Whether to display progress bars for
+long-running motif-file operations.}
 }
 \value{
-A \code{HERVarium_annotation} object containing annotation tables, feature summaries, optional regulatory layers, and output metadata.
+A \code{HERVarium_annotation} object containing the compact HERV-level
+feature table, matched annotation, missing IDs, summary statistics,
+optional detailed regulatory results, output metadata, and generated-file
+paths.
 }
 \description{
 Annotates and summarizes a single list of HERV internal-region IDs using
-HERVariumR annotation layers. The function can add internal domain
-annotations, LTR information, IFN-related LTR features, terminal-exon domain
-annotations, optional detailed LTR TFBM hits, optional detailed RBP motif
-hits, summary plots, and an interactive dashboard.
+HERVariumR annotation layers. Standard output is intentionally compact:
+a HERV-level feature table, an input summary, an RDS object, and a concise
+interactive dashboard. Extended output additionally writes detailed tables
+and optional static plots under \verb{details/} and \verb{plots/}.
 }
